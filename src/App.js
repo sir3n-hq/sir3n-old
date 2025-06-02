@@ -1,20 +1,26 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { LoadScript } from '@react-google-maps/api';
-import SubmissionForm from './components/SubmissionForm';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navigation from './components/Navigation';
+import LandingPage from './pages/LandingPage';
+import MapPage from './pages/MapPage';
+import WhoAreWePage from './pages/WhoAreWePage';
+import SubmissionsPage from './pages/SubmissionsPage';
+import './App.css';
 
-const GOOGLE_API_KEY = 'AIzaSyC_xCYVOeiOQcf44wR2V0supxqRsQekfNQ';
-
-function App() {
-  return (
-    <LoadScript googleMapsApiKey={GOOGLE_API_KEY} libraries={['places']}>
-      <BrowserRouter>
+const App = () => (
+  <Router>
+    <div className="app">
+      <Navigation />
+      <main>
         <Routes>
-          <Route path="/" element={<SubmissionForm />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/who-are-we" element={<WhoAreWePage />} />
+          <Route path="/submissions" element={<SubmissionsPage />} />
         </Routes>
-      </BrowserRouter>
-    </LoadScript>
-  );
-}
+      </main>
+    </div>
+  </Router>
+);
 
 export default App;
