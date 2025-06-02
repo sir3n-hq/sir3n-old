@@ -1,43 +1,43 @@
-import React, { useState } from "react";
-import { db } from "../firebase";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
-import Select from "react-select";
-import LocationAutocomplete from "./LocationAutocomplete";
+import React, { useState } from 'react';
+import { db } from '../firebase'; // Ensure this path is correct
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import Select from 'react-select';
+import LocationAutocomplete from './LocationAutocomplete';
 
 const eventOptions = [
-  { value: "verbal assault", label: "Verbal Assault" },
-  { value: "physical assault", label: "Physical Assault" },
-  { value: "harassment", label: "Harassment" },
-  { value: "stalking", label: "Stalking" },
-  { value: "spiking", label: "Spiking" },
-  { value: "sexual assault", label: "Sexual Assault" },
-  { value: "rape", label: "Rape" },
+  { value: 'verbal assault', label: 'Verbal Assault' },
+  { value: 'physical assault', label: 'Physical Assault' },
+  { value: 'harassment', label: 'Harassment' },
+  { value: 'stalking', label: 'Stalking' },
+  { value: 'spiking', label: 'Spiking' },
+  { value: 'sexual assault', label: 'Sexual Assault' },
+  { value: 'rape', label: 'Rape' },
 ];
 
 const perpetratorOptions = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "tall", label: "Tall" },
-  { value: "short", label: "Short" },
-  { value: "old", label: "Old" },
-  { value: "young", label: "Young" },
-  { value: "middle-aged", label: "Middle Aged" },
-  { value: "group", label: "Group" },
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'tall', label: 'Tall' },
+  { value: 'short', label: 'Short' },
+  { value: 'old', label: 'Old' },
+  { value: 'young', label: 'Young' },
+  { value: 'middle-aged', label: 'Middle Aged' },
+  { value: 'group', label: 'Group' },
 ];
 
 const SubmissionForm = () => {
   const [eventType, setEventType] = useState([]);
   const [perpetratorTags, setPerpetratorTags] = useState([]);
-  const [location, setLocation] = useState({ address: "", lat: null, lng: null });
-  const [details, setDetails] = useState("");
-  const [knowLocation, setKnowLocation] = useState("");
+  const [location, setLocation] = useState({ address: '', lat: null, lng: null });
+  const [details, setDetails] = useState('');
+  const [knowLocation, setKnowLocation] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await addDoc(collection(db, "submissions"), {
+      await addDoc(collection(db, 'submissions'), {
         eventType: eventType.map((opt) => opt.value),
         perpetratorTags: perpetratorTags.map((opt) => opt.value),
         location,
@@ -47,7 +47,7 @@ const SubmissionForm = () => {
       });
       setSubmitted(true);
     } catch (err) {
-      console.error("Error adding document: ", err);
+      console.error('Error adding document: ', err);
     }
   };
 

@@ -1,62 +1,36 @@
-import React, { useState } from "react";
-import usePlacesAutocomplete, {
-  getGeocode,
-  getLatLng,
-} from "use-places-autocomplete";
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxPopover,
-  ComboboxList,
-  ComboboxOption,
-} from "@reach/combobox";
-import "@reach/combobox/styles.css";
+import React, { useRef, useEffect } from 'react';
 
 const LocationAutocomplete = ({ onSelect }) => {
-  const {
-    ready,
-    value,
-    suggestions: { status, data },
-    setValue,
-    clearSuggestions,
-  } = usePlacesAutocomplete({
-    requestOptions: {
-      /* Define geographic bounds if desired */
-    },
-    debounce: 300,
-  });
+  const inputRef = useRef(null);
+  const autocompleteRef = useRef(null);
 
-  const handleSelect = async (address) => {
-    setValue(address, false);
-    clearSuggestions();
+  useEffect(() => {
+    if (!window.google || !window.google.maps) return;
 
-    try {
-      const results = await getGeocode({ address });
-      const { lat, lng } = await getLatLng(results[0]);
-      onSelect({ address, lat, lng });
-    } catch (error) {
-      console.error("Error: ", error);
-    }
-  };
+    autocompleteRef.current = new window.google.maps.places.Autocomplete(
+      inputRef.current,
+      { types: ['geocode'] }
+    );
+
+    autocompleteRef.current.addListener('place_changed', () => {
+      const place = autocompleteRef.current.getPlace();
+      if (place.geometry) {
+        onSelect({
+          address: place.formatted_address,
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        });
+      }
+    });
+  }, [onSelect]);
 
   return (
-    <Combobox onSelect={handleSelect}>
-      <ComboboxInput
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        disabled={!ready}
-        placeholder="Enter location"
-        className="w-full p-2 border rounded"
-      />
-      <ComboboxPopover>
-        <ComboboxList>
-          {status === "OK" &&
-            data.map(({ place_id, description }) => (
-              <ComboboxOption key={place_id} value={description} />
-            ))}
-        </ComboboxList>
-      </ComboboxPopover>
-    </Combobox>
+    <input
+      type="text"
+      ref={inputRef}
+      placeholder="Enter location"
+      className="w-full p-2 border rounded"
+    />
   );
 };
 
