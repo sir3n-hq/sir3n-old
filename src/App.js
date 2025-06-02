@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SubmissionForm from "./components/SubmissionForm";
 import Dashboard from "./components/Dashboard";
 import React from "react";
-import SubmissionForm from "./components/SubmissionForm";
 import "./App.css";
 
 function App() {
