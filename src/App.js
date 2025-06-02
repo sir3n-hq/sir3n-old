@@ -13,10 +13,6 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
-
-    <div className="App">
-        <SubmissionForm />
-    </div>
   );
 }
 
