@@ -1,142 +1,118 @@
 import React, { useState } from "react";
-import Select from "react-select";
-import axios from "axios";
 import { db } from "../firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import Select from "react-select";
+import LocationAutocomplete from "./LocationAutocomplete";
+
+const eventOptions = [
+  { value: "verbal assault", label: "Verbal Assault" },
+  { value: "physical assault", label: "Physical Assault" },
+  { value: "harassment", label: "Harassment" },
+  { value: "stalking", label: "Stalking" },
+  { value: "spiking", label: "Spiking" },
+  { value: "sexual assault", label: "Sexual Assault" },
+  { value: "rape", label: "Rape" },
+];
 
 const perpetratorOptions = [
   { value: "male", label: "Male" },
   { value: "female", label: "Female" },
-  { value: "group", label: "Group" },
-  { value: "young", label: "Young" },
-  { value: "middle-aged", label: "Middle Aged" },
-  { value: "old", label: "Old" },
   { value: "tall", label: "Tall" },
   { value: "short", label: "Short" },
+  { value: "old", label: "Old" },
+  { value: "young", label: "Young" },
+  { value: "middle-aged", label: "Middle Aged" },
+  { value: "group", label: "Group" },
 ];
 
-const eventOptions = [
-  { value: "verbal", label: "Verbal Assault" },
-  { value: "physical", label: "Physical Assault" },
-  { value: "harassment", label: "Harassment" },
-  { value: "stalking", label: "Stalking" },
-  { value: "spiking", label: "Spiking" },
-  { value: "sexual", label: "Sexual Assault" },
-  { value: "rape", label: "Rape" },
-];
-
-export default function SubmissionForm() {
-  const [location, setLocation] = useState("");
-  const [locationSuggestions, setLocationSuggestions] = useState([]);
-  const [description, setDescription] = useState("");
+const SubmissionForm = () => {
+  const [eventType, setEventType] = useState([]);
   const [perpetratorTags, setPerpetratorTags] = useState([]);
-  const [eventTags, setEventTags] = useState([]);
-  const [knowsLocation, setKnowsLocation] = useState("");
-  const [message, setMessage] = useState("");
-
-  const handleLocationChange = async (e) => {
-    const value = e.target.value;
-    setLocation(value);
-    if (value.length > 2) {
-      const res = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${value}`
-      );
-      setLocationSuggestions(res.data);
-    } else {
-      setLocationSuggestions([]);
-    }
-  };
+  const [location, setLocation] = useState({ address: "", lat: null, lng: null });
+  const [details, setDetails] = useState("");
+  const [knowLocation, setKnowLocation] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await addDoc(collection(db, "submissions"), {
+        eventType: eventType.map((opt) => opt.value),
+        perpetratorTags: perpetratorTags.map((opt) => opt.value),
         location,
-        description,
-        perpetratorTags: perpetratorTags.map((t) => t.value),
-        eventTags: eventTags.map((t) => t.value),
-        knowsLocation,
-        created: Timestamp.now(),
+        details,
+        knowLocation,
+        timestamp: Timestamp.now(),
       });
-      setMessage("Submitted successfully.");
+      setSubmitted(true);
     } catch (err) {
       console.error("Error adding document: ", err);
-      setMessage("Submission failed.");
     }
   };
 
+  if (submitted) {
+    return <p className="text-green-600 text-center mt-8">Thank you for your submission.</p>;
+  }
+
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Submit Your Story</h2>
+    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Share Your Story</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block font-semibold">Where did it happen?</label>
-          <input
-            type="text"
-            value={location}
-            onChange={handleLocationChange}
-            className="w-full border p-2 rounded"
-            placeholder="Start typing a location..."
-          />
-          {locationSuggestions.length > 0 && (
-            <ul className="border bg-white max-h-40 overflow-y-auto rounded shadow">
-              {locationSuggestions.map((loc) => (
-                <li
-                  key={loc.place_id}
-                  className="p-2 hover:bg-purple-100 cursor-pointer"
-                  onClick={() => {
-                    setLocation(loc.display_name);
-                    setLocationSuggestions([]);
-                  }}
-                >
-                  {loc.display_name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div>
-          <label className="block font-semibold">Describe what happened</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full border p-2 rounded"
-            rows={5}
+          <label className="block text-sm font-medium">Type of Event</label>
+          <Select
+            isMulti
+            options={eventOptions}
+            value={eventType}
+            onChange={setEventType}
           />
         </div>
 
         <div>
-          <label className="block font-semibold">Describe the perpetrator</label>
+          <label className="block text-sm font-medium">Location of Event</label>
+          <LocationAutocomplete onSelect={(loc) => setLocation(loc)} />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Describe the Perpetrator</label>
           <Select
             isMulti
             options={perpetratorOptions}
+            value={perpetratorTags}
             onChange={setPerpetratorTags}
           />
         </div>
 
         <div>
-          <label className="block font-semibold">Type of event</label>
-          <Select isMulti options={eventOptions} onChange={setEventTags} />
+          <label className="block text-sm font-medium">What Happened?</label>
+          <textarea
+            className="w-full p-2 border rounded"
+            rows="4"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+          ></textarea>
         </div>
 
         <div>
-          <label className="block font-semibold">
-            Do you know where they live or work?
-          </label>
-          <input
-            type="text"
-            value={knowsLocation}
-            onChange={(e) => setKnowsLocation(e.target.value)}
-            className="w-full border p-2 rounded"
-          />
+          <label className="block text-sm font-medium">Do you know where they live or work?</label>
+          <textarea
+            className="w-full p-2 border rounded"
+            rows="2"
+            value={knowLocation}
+            onChange={(e) => setKnowLocation(e.target.value)}
+          ></textarea>
         </div>
 
-        <button type="submit" className="bg-purple-700 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="w-full py-2 px-4 bg-black text-white rounded hover:bg-gray-800"
+        >
           Submit
         </button>
-        {message && <p className="text-sm text-green-600 mt-2">{message}</p>}
       </form>
     </div>
   );
-}
+};
+
+export default SubmissionForm;
