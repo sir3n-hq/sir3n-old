@@ -1,7 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Bokor';
+  src: url('./fonts/Bokor-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #000;
-  color: #fff;
+  @apply bg-black text-white;
+  font-family: 'Silkscreen', sans-serif;
 }

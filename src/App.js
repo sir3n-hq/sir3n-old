@@ -1,26 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navigation from './components/Navigation';
-import LandingPage from './pages/LandingPage';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
 import MapPage from './pages/MapPage';
-import WhoAreWePage from './pages/WhoAreWePage';
+import AboutPage from './pages/AboutPage';
 import SubmissionsPage from './pages/SubmissionsPage';
-import './App.css';
 
-const App = () => (
-  <Router>
-    <div className="app">
-      <Navigation />
-      <main>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/map" element={<MapPage />} />
-          <Route path="/who-are-we" element={<WhoAreWePage />} />
-          <Route path="/submissions" element={<SubmissionsPage />} />
-        </Routes>
-      </main>
-    </div>
-  </Router>
-);
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/map" element={<MapPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/submissions" element={<SubmissionsPage />} />
+    </Routes>
+  );
+}
 
 export default App;
